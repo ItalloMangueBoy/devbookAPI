@@ -14,7 +14,5 @@ func Gen() *mux.Router {
 
 	route.Config(router)
 
-	return router 
+	return router
 }
-
-
