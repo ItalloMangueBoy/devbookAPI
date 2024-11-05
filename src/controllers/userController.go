@@ -1,12 +1,16 @@
 package controllers
 
 import (
+	"database/sql"
 	"devbookAPI/src/helper"
 	"devbookAPI/src/model"
 	"devbookAPI/src/view"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // CreateUser: Creates a new user
@@ -32,7 +36,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	search := strings.ToLower(r.URL.Query().Get("user"))
 	search = strings.TrimSpace(search)
 
-	users, err := helper.SearchUser(search)
+	users, err := helper.GetUsers(search)
 	if err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
 		return
@@ -43,7 +47,24 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 // GetUser: Search one user
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 422)
+	}
 
+	user, err := helper.GetUserById(id)
+
+	if err == sql.ErrNoRows {
+		view.GenErrorTemplate(err).Send(w, 404)
+		return
+	}
+
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	view.JSON(w, 200, user)
 }
 
 // UpdateUser: Updates an user

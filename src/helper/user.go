@@ -3,7 +3,6 @@ package helper
 import (
 	db "devbookAPI/src/database"
 	"devbookAPI/src/model"
-	"errors"
 	"fmt"
 )
 
@@ -11,7 +10,7 @@ import (
 func CreateUser(user *model.User) error {
 	stmt, err := db.Conn.Prepare("INSERT INTO users (name, nick, email, password) VALUES (?, ?, ?, ?)")
 	if err != nil {
-		return errors.New("cannot generate insert querry")
+		return err
 	}
 
 	res, err := stmt.Exec(user.Name, user.Nick, user.Email, user.Password)
@@ -21,14 +20,14 @@ func CreateUser(user *model.User) error {
 
 	user.Id, err = res.LastInsertId()
 	if err != nil {
-		return errors.New("cannot search inserted id into database")
+		return err
 	}
 
 	return nil
 }
 
-// SearchUser: Search users like recived string in database
-func SearchUser(search string) ([]model.User, error) {
+// GetUsers: Search users like recived string in database
+func GetUsers(search string) ([]model.User, error) {
 	search = fmt.Sprintf("%%%s%%", search)
 
 	rows, err := db.Conn.Query(
@@ -59,4 +58,13 @@ func SearchUser(search string) ([]model.User, error) {
 	}
 
 	return users, nil
+}
+
+// GetUsers: Search users like recived string in database
+func GetUserById(id uint64) (user model.User, err error) {
+	err = db.Conn.
+		QueryRow("SELECT id, name, nick, email, created_at FROM users WHERE id = ?", id).
+		Scan(&user.Id, &user.Name, &user.Nick, &user.Email, &user.CreatedAt)
+
+	return
 }

@@ -20,7 +20,7 @@ var userRoutes = []Route{
 	},
 
 	{
-		URI:     "/users{id}",
+		URI:     "/users/{id}",
 		Method:  "GET",
 		Handler: controllers.GetUser,
 		Auth:    false,
