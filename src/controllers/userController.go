@@ -6,6 +6,7 @@ import (
 	"devbookAPI/src/view"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // CreateUser: Creates a new user
@@ -28,7 +29,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUsers: Search all users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("dioashjdikhjsbdfn"))
+	search := strings.ToLower(r.URL.Query().Get("user"))
+	search = strings.TrimSpace(search)
+
+	users, err := helper.SearchUser(search)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	view.JSON(w, 200, users)
 }
 
 // GetUser: Search one user
