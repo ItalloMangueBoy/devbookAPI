@@ -1,10 +1,29 @@
 package controllers
 
-import "net/http"
+import (
+	"devbookAPI/src/helper"
+	"devbookAPI/src/model"
+	"devbookAPI/src/view"
+	"fmt"
+	"net/http"
+)
 
 // CreateUser: Creates a new user
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	var user model.User
 
+	if err := user.Prepare(r); err != nil {
+		view.GenErrorTemplate(err).Send(w, 422)
+		return
+	}
+
+	if err := helper.CreateUser(&user); err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	w.WriteHeader(201)
+	w.Header().Set("Location", fmt.Sprintf("/users/%d", user.Id))
 }
 
 // GetUsers: Search all users

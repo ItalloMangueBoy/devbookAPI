@@ -15,6 +15,7 @@ func main() {
 	if err := database.Connect(); err != nil {
 		log.Fatal(err)
 	}
+	defer database.Conn.Close()
 
 	router := router.Gen()
 
