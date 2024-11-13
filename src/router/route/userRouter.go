@@ -8,7 +8,7 @@ var userRoutes = []Route{
 	{
 		URI:     "/users",
 		Method:  "POST",
-		Handler: controllers.CreateUser,
+		Handler: controllers.PostUser,
 		Auth:    false,
 	},
 
@@ -27,14 +27,14 @@ var userRoutes = []Route{
 	},
 
 	{
-		URI:     "/users{id}",
+		URI:     "/users/{id}",
 		Method:  "PUT",
-		Handler: controllers.UpdateUser,
+		Handler: controllers.PutUser,
 		Auth:    false,
 	},
 
 	{
-		URI:     "/users{id}",
+		URI:     "/users/{id}",
 		Method:  "DELETE",
 		Handler: controllers.DeleteUser,
 		Auth:    false,

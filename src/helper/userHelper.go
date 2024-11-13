@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-// CreateUser: insert one user in database
+// CreateUser: Insert one user in database
 func CreateUser(user *model.User) error {
 	stmt, err := db.Conn.Prepare("INSERT INTO users (name, nick, email, password) VALUES (?, ?, ?, ?)")
 	if err != nil {
@@ -26,8 +26,8 @@ func CreateUser(user *model.User) error {
 	return nil
 }
 
-// GetUsers: Search users like recived string in database
-func GetUsers(search string) ([]model.User, error) {
+// SearchUsers: Search users like recived string in database
+func SearchUsers(search string) ([]model.User, error) {
 	search = fmt.Sprintf("%%%s%%", search)
 
 	rows, err := db.Conn.Query(
@@ -61,10 +61,24 @@ func GetUsers(search string) ([]model.User, error) {
 }
 
 // GetUsers: Search users like recived string in database
-func GetUserById(id uint64) (user model.User, err error) {
+func SearchUserById(id uint64) (user model.User, err error) {
 	err = db.Conn.
 		QueryRow("SELECT id, name, nick, email, created_at FROM users WHERE id = ?", id).
 		Scan(&user.Id, &user.Name, &user.Nick, &user.Email, &user.CreatedAt)
 
 	return
+}
+
+// UpdateUser: Updates one user in database
+func UpdateUser(user *model.User) error {
+	stmt, err := db.Conn.Prepare("UPDATE users SET name = ?, nick = ?, email = ? WHERE id = ?")
+	if err != nil {
+		return err
+	}
+
+	if _, err := stmt.Exec(user.Name, user.Nick, user.Email, user.Id); err != nil {
+		return err
+	}
+
+	return nil
 }
