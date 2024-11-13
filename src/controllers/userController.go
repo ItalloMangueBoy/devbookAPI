@@ -47,7 +47,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 // GetUser: Search one user
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseUint(mux.Vars(r)["id"], 10, 64)
+	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	if err != nil {
 		view.GenErrorTemplate(err).Send(w, 422)
 	}
@@ -94,5 +94,28 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUser: Deletes an user
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 422)
+		return
+	}
 
+	_, err = helper.SearchUserById(id)
+	if err == sql.ErrNoRows {
+		view.GenErrorTemplate(err).Send(w, 404)
+		return
+	}
+
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	err = helper.DeleteUser(id)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	w.WriteHeader(204)
 }

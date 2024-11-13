@@ -12,6 +12,7 @@ func CreateUser(user *model.User) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(user.Name, user.Nick, user.Email, user.Password)
 	if err != nil {
@@ -61,7 +62,7 @@ func SearchUsers(search string) ([]model.User, error) {
 }
 
 // GetUsers: Search users like recived string in database
-func SearchUserById(id uint64) (user model.User, err error) {
+func SearchUserById(id int64) (user model.User, err error) {
 	err = db.Conn.
 		QueryRow("SELECT id, name, nick, email, created_at FROM users WHERE id = ?", id).
 		Scan(&user.Id, &user.Name, &user.Nick, &user.Email, &user.CreatedAt)
@@ -75,8 +76,25 @@ func UpdateUser(user *model.User) error {
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	if _, err := stmt.Exec(user.Name, user.Nick, user.Email, user.Id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteUser: delete one user inside database
+func DeleteUser(id int64) error {
+	stmt, err := db.Conn.Prepare("DELETE FROM users WHERE id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
 		return err
 	}
 
