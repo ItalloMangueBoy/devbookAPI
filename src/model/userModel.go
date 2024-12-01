@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/badoux/checkmail"
 )
 
 // User: Represents an API user
@@ -51,6 +53,12 @@ func (user *User) Validate(operation string) error {
 	}
 	if len(user.Email) > 50 {
 		return errors.New("email too long")
+	}
+	if err := checkmail.ValidateFormat(user.Email); err != nil {
+		return err
+	}
+	if err := checkmail.ValidateHost(user.Email); err != nil {
+		return err
 	}
 
 	// Password validation
