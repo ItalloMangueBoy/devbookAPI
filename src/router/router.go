@@ -1,7 +1,7 @@
 package router
 
 import (
-	"devbookAPI/src/router/route"
+	"devbookAPI/src/router/routes"
 
 	"github.com/gorilla/mux"
 )
@@ -12,7 +12,7 @@ type Router *mux.Router
 func Gen() *mux.Router {
 	router := mux.NewRouter()
 
-	route.Config(router)
+	routes.Config(router)
 
 	return router
 }

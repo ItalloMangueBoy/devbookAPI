@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"database/sql"
-	"devbookAPI/src/helper"
+	userhelper "devbookAPI/src/helper/userHelper"
 	"devbookAPI/src/model"
 	"devbookAPI/src/view"
 	"fmt"
@@ -22,13 +22,13 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := helper.CreateUser(&user); err != nil {
+	if err := userhelper.CreateUser(&user); err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
 		return
 	}
 
-	w.WriteHeader(201)
 	w.Header().Set("Location", fmt.Sprintf("/users/%d", user.Id))
+	w.WriteHeader(201)
 }
 
 // GetUsers: Search all users
@@ -36,7 +36,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	search := strings.ToLower(r.URL.Query().Get("user"))
 	search = strings.TrimSpace(search)
 
-	users, err := helper.SearchUsers(search)
+	users, err := userhelper.SearchUsers(search)
 	if err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
 		return
@@ -52,7 +52,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		view.GenErrorTemplate(err).Send(w, 422)
 	}
 
-	user, err := helper.SearchUserById(id)
+	user, err := userhelper.SearchUserById(id)
 
 	if err == sql.ErrNoRows {
 		view.GenErrorTemplate(err).Send(w, 404)
@@ -83,7 +83,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := helper.UpdateUser(&user); err != nil {
+	if err := userhelper.UpdateUser(&user); err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
 		return
 	}
@@ -100,7 +100,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = helper.SearchUserById(id)
+	_, err = userhelper.SearchUserById(id)
 	if err == sql.ErrNoRows {
 		view.GenErrorTemplate(err).Send(w, 404)
 		return
@@ -111,7 +111,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = helper.DeleteUser(id)
+	err = userhelper.DeleteUser(id)
 	if err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
 		return

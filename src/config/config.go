@@ -15,6 +15,9 @@ var DB_URI string
 // PORT: Port the server is listening on
 var PORT int
 
+// aplication secret key
+var SECRET []byte
+
 // Load: Loads envyroments variables
 func Load() {
 	var err error
@@ -34,4 +37,6 @@ func Load() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 	)
+
+	SECRET = []byte(os.Getenv("SECRET"))
 }

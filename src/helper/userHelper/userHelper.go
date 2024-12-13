@@ -1,4 +1,4 @@
-package helper
+package userhelper
 
 import (
 	db "devbookAPI/src/database"
@@ -61,11 +61,20 @@ func SearchUsers(search string) ([]model.User, error) {
 	return users, nil
 }
 
-// GetUsers: Search users like recived string in database
+// SearchUserById: Search one user whith given id
 func SearchUserById(id int64) (user model.User, err error) {
 	err = db.Conn.
 		QueryRow("SELECT id, name, nick, email, created_at FROM users WHERE id = ?", id).
 		Scan(&user.Id, &user.Name, &user.Nick, &user.Email, &user.CreatedAt)
+
+	return
+}
+
+// SearchUserByEmail: Search one user whith given email
+func SearchUserByEmail(email string) (user model.User, err error) {
+	err = db.Conn.
+		QueryRow("SELECT id, name, nick, email, password, created_at FROM users WHERE email = ?", email).
+		Scan(&user.Id, &user.Name, &user.Nick, &user.Email, &user.Password, &user.CreatedAt)
 
 	return
 }

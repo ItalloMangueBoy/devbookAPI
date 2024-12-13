@@ -1,6 +1,7 @@
 package model
 
 import (
+	"devbookAPI/src/security"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -57,9 +58,6 @@ func (user *User) Validate(operation string) error {
 	if err := checkmail.ValidateFormat(user.Email); err != nil {
 		return err
 	}
-	if err := checkmail.ValidateHost(user.Email); err != nil {
-		return err
-	}
 
 	// Password validation
 	if operation == "register" {
@@ -69,6 +67,13 @@ func (user *User) Validate(operation string) error {
 		if len(user.Password) > 50 {
 			return errors.New("password too long")
 		}
+
+		hash, err := security.HashPassword(user.Password)
+		if err != nil {
+			return err
+		}
+
+		user.Password = hash
 	}
 
 	// Returns
