@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"database/sql"
+	"devbookAPI/src/auth"
 	userhelper "devbookAPI/src/helper/userHelper"
 	"devbookAPI/src/model"
 	"devbookAPI/src/view"
@@ -78,6 +79,17 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	authId, err := auth.GetAuthenticatedId(r)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 401)
+		return
+	}
+
+	if err := auth.CheckUserPermision(user.Id, authId); err != nil {
+		view.GenErrorTemplate(err).Send(w, 403)
+		return
+	}
+
 	if err := user.Prepare(r, "update"); err != nil {
 		view.GenErrorTemplate(err).Send(w, 422)
 		return
@@ -97,6 +109,17 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	if err != nil {
 		view.GenErrorTemplate(err).Send(w, 422)
+		return
+	}
+
+	authId, err := auth.GetAuthenticatedId(r)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 401)
+		return
+	}
+
+	if err := auth.CheckUserPermision(id, authId); err != nil {
+		view.GenErrorTemplate(err).Send(w, 403)
 		return
 	}
 

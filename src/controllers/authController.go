@@ -77,7 +77,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Gen token
-	token, err := auth.GenUserToken(user)
+	token, err := auth.GenToken(user)
 	if err != nil {
 		view.GenErrorTemplate(fmt.Errorf("can not generate user token")).Send(w, 500)
 		return
