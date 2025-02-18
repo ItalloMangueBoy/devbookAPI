@@ -3,9 +3,11 @@ package controllers
 import (
 	"database/sql"
 	"devbookAPI/src/auth"
+	"devbookAPI/src/helper/followhelper"
 	userhelper "devbookAPI/src/helper/userHelper"
 	"devbookAPI/src/model"
 	"devbookAPI/src/view"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -141,4 +143,31 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(204)
+}
+
+// FollowUser: Follows on user
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+	followerID, err := auth.GetAuthenticatedId(r)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 401)
+		return
+	}
+
+	userID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 400)
+		return
+	}
+
+	if userID == followerID {
+		view.GenErrorTemplate(errors.New("you cannot follow yourself")).Send(w, 403)
+		return
+	}
+
+	if err := followhelper.FollowUser(userID, followerID); err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	w.WriteHeader(201)
 }
