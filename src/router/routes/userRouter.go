@@ -41,14 +41,21 @@ var userRoutes = []Route{
 	},
 
 	{
-		URI:     "/users/{id}/follow",
+		URI:     "/users/{id}/followers",
+		Method:  "GET",
+		Handler: controllers.GetUserFollowers,
+		Auth:    false,
+	},
+
+	{
+		URI:     "/follow/{id}",
 		Method:  "POST",
 		Handler: controllers.FollowUser,
 		Auth:    true,
 	},
 
 	{
-		URI:     "/users/{id}/unfollow",
+		URI:     "/unfollow/{id}",
 		Method:  "DELETE",
 		Handler: controllers.UnfollowUser,
 		Auth:    true,
