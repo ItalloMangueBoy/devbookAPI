@@ -145,7 +145,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(204)
 }
 
-// FollowUser: Follows on user
+// FollowUser: Follows an user
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 	followerID, err := auth.GetAuthenticatedId(r)
 	if err != nil {
@@ -170,4 +170,31 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(201)
+}
+
+// UnfollowUser: Unfollows an user
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+	followerID, err := auth.GetAuthenticatedId(r)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 401)
+		return
+	}
+
+	userID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 400)
+		return
+	}
+
+	if userID == followerID {
+		view.GenErrorTemplate(errors.New("you cannot follow yourself")).Send(w, 403)
+		return
+	}
+
+	if err := followhelper.UnfollowUser(userID, followerID); err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	w.WriteHeader(204)
 }
