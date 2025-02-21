@@ -164,6 +164,25 @@ func GetUserFollowers(w http.ResponseWriter, r *http.Request) {
 	view.JSON(w, 200, followers)
 }
 
+// GetUserFollows: Search all users that an user follows
+func GetUserFollows(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 422)
+	}
+
+	followers, err := followhelper.GetUserFollows(id)
+
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	fmt.Println(followers)
+
+	view.JSON(w, 200, followers)
+}
+
 // FollowUser: Follows an user
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 	followerID, err := auth.GetAuthenticatedId(r)

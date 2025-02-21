@@ -48,6 +48,13 @@ var userRoutes = []Route{
 	},
 
 	{
+		URI:     "/users/{id}/follows",
+		Method:  "GET",
+		Handler: controllers.GetUserFollows,
+		Auth:    false,
+	},
+
+	{
 		URI:     "/follow/{id}",
 		Method:  "POST",
 		Handler: controllers.FollowUser,

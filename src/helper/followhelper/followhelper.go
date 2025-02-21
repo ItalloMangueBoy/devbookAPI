@@ -38,6 +38,39 @@ func GetUserFollowers(userID int64) ([]model.User, error) {
 	return followers, nil
 }
 
+// GetUserFollows: Get all users that a user follows
+func GetUserFollows(userID int64) ([]model.User, error) {
+	rows, err := db.Conn.Query(`
+		SELECT u.id, u.name, u.nick, u.email, u.created_at FROM users u 
+		INNER JOIN followers f ON  u.id = f.user_id
+		WHERE f.follower_id = ?
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var followers []model.User
+
+	for rows.Next() {
+		var user model.User
+
+		if err := rows.Scan(
+			&user.Id,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		followers = append(followers, user)
+	}
+
+	return followers, nil
+}
+
 // FollowUser: Register a follower relationship in the database
 func FollowUser(userID, followerID int64) error {
 	stmt, err := db.Conn.Prepare("INSERT IGNORE INTO followers (user_id, follower_id) VALUES (?, ?)")
