@@ -3,6 +3,7 @@ package userhelper
 import (
 	db "devbookAPI/src/database"
 	"devbookAPI/src/model"
+	"devbookAPI/src/security"
 	"fmt"
 )
 
@@ -68,6 +69,45 @@ func SearchUserById(id int64) (user model.User, err error) {
 		Scan(&user.Id, &user.Name, &user.Nick, &user.Email, &user.CreatedAt)
 
 	return
+}
+
+// CheckUserPassword: Check if user password is correct
+func CheckUserPassword(id int64, plaintext string) error {
+	var password string
+	row := db.Conn.QueryRow("SELECT password FROM users WHERE id = ?", id)
+
+	if err := row.Scan(&password); err != nil {
+		return fmt.Errorf("user or password invalid")
+	}
+
+	if !security.ValidPassword(password, plaintext) {
+		return fmt.Errorf("actual password is incorrect")
+	}
+
+	return nil
+}
+
+// UpdateUserPassword: Update an user password
+func UpdateUserPassword(id int64, password string) error {
+	// hash password
+	hash, err := security.HashPassword(password)
+	if err != nil {
+		return fmt.Errorf("error on hashing password")
+	}
+
+	// excute update on database
+	stmt, err := db.Conn.Prepare("UPDATE users SET password = ? WHERE id = ?")
+	if err != nil {
+		return fmt.Errorf("error on updating password")
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(hash, id); err != nil {
+		return fmt.Errorf("error on updating password") 
+	}
+
+	// return
+	return nil
 }
 
 // SearchUserByEmail: Search one user whith given email

@@ -3,6 +3,7 @@ package controllers
 import (
 	"database/sql"
 	"devbookAPI/src/auth"
+	forms "devbookAPI/src/forms/user_forms"
 	"devbookAPI/src/helper/followhelper"
 	userhelper "devbookAPI/src/helper/userHelper"
 	"devbookAPI/src/model"
@@ -103,6 +104,33 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Location", fmt.Sprintf("/users/%d", user.Id))
+	w.WriteHeader(204)
+}
+
+// PutUserPassword: Updates an user password
+func PutUserPassword(w http.ResponseWriter, r *http.Request) {
+	var form forms.PasswordForm
+	var err error
+
+	// read request
+	id, err := auth.GetAuthenticatedId(r)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 401)
+		return
+	}
+
+	if err := form.Prepare(r, id); err != nil {
+		view.GenErrorTemplate(err).Send(w, 422)
+		return
+	}
+
+	// update password operation
+	if err := userhelper.UpdateUserPassword(id, form.NewPassword); err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	// send response
 	w.WriteHeader(204)
 }
 

@@ -34,6 +34,13 @@ var userRoutes = []Route{
 	},
 
 	{
+		URI:     "/users/{id}/password",
+		Method:  "PUT",
+		Handler: controllers.PutUserPassword,
+		Auth:    true,
+	},
+
+	{
 		URI:     "/users/{id}",
 		Method:  "DELETE",
 		Handler: controllers.DeleteUser,
