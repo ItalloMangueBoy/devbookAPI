@@ -35,7 +35,7 @@ var userRoutes = []Route{
 
 	{
 		URI:     "/users/{id}/password",
-		Method:  "PUT",
+		Method:  "PATCH",
 		Handler: controllers.PutUserPassword,
 		Auth:    true,
 	},

@@ -17,7 +17,7 @@ type Route struct {
 
 func Config(router *mux.Router) {
 	// Popula variavel app_routescomtodas as rotas do app
-	origins := [][]Route{userRoutes, authRoutes}
+	origins := [][]Route{userRoutes, authRoutes, postRoutes}
 
 	var app_routes []Route
 
