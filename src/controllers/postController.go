@@ -1,10 +1,30 @@
 package controllers
 
-import "net/http"
+import (
+	postsforms "devbookAPI/src/forms/postsForms"
+	"devbookAPI/src/helper/posthelper"
+	"devbookAPI/src/view"
+	"net/http"
+)
 
-// CreatePost: create a post
+// CreatePost: create a new post
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	// read post data
+	var form postsforms.Create
 
+	if err := form.Prepare(r); err != nil {
+		view.GenErrorTemplate(err).Send(w, 422)
+		return
+	}
+
+	// insert post in database
+	if err := posthelper.Create(&form); err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	// Return success
+	w.WriteHeader(201)
 }
 
 // GetPost: return a post
