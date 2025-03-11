@@ -30,8 +30,19 @@ func GetByID(ID int64) (model.Post, error) {
 	var post model.Post
 
 	err := db.Conn.
-		QueryRow("SELECT posts.id, posts.content, posts.likes, posts.created_at, users.id, users.nick FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.id = ?", ID).
-		Scan(&post.ID, &post.Content, &post.Likes, &post.CreatedAt, &post.AuthorID, &post.AuthorNick)
+		QueryRow(`
+			SELECT p.*, u.nick 
+			FROM posts p INNER JOIN users u ON p.user_id = u.id 
+			WHERE p.id = ?
+		`, ID).
+		Scan(
+			&post.ID,
+			&post.AuthorID,
+			&post.Content,
+			&post.Likes,
+			post.CreatedAt,
+			&post.AuthorNick,
+		)
 	if err != nil {
 		return model.Post{}, errors.New("error on server operation")
 	}
