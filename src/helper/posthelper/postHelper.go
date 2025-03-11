@@ -3,6 +3,7 @@ package posthelper
 import (
 	db "devbookAPI/src/database"
 	postsforms "devbookAPI/src/forms/postsForms"
+	"devbookAPI/src/model"
 	"errors"
 )
 
@@ -22,4 +23,18 @@ func Create(data *postsforms.Create) error {
 
 	// return success
 	return nil
+}
+
+// GetByID: search a post into database with given ID
+func GetByID(ID int64) (model.Post, error) {
+	var post model.Post
+
+	err := db.Conn.
+		QueryRow("SELECT posts.id, posts.content, posts.likes, posts.created_at, users.id, users.nick FROM posts INNER JOIN users ON posts.user_id = users.id WHERE posts.id = ?", ID).
+		Scan(&post.ID, &post.Content, &post.Likes, &post.CreatedAt, &post.AuthorID, &post.AuthorNick)
+	if err != nil {
+		return model.Post{}, errors.New("error on server operation")
+	}
+
+	return post, nil
 }

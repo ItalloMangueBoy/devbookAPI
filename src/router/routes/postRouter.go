@@ -23,7 +23,7 @@ var postRoutes = []Route{
 		URI:     "/posts/{id}",
 		Method:  "GET",
 		Handler: controllers.GetPost,
-		Auth:    true,
+		Auth:    false,
 	},
 
 	{

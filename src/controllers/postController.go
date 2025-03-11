@@ -4,7 +4,11 @@ import (
 	postsforms "devbookAPI/src/forms/postsForms"
 	"devbookAPI/src/helper/posthelper"
 	"devbookAPI/src/view"
+	"errors"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // CreatePost: create a new post
@@ -29,7 +33,22 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 // GetPost: return a post
 func GetPost(w http.ResponseWriter, r *http.Request) {
+	// read post ID
+	ID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(errors.New("invalid post ID")).Send(w, 422)
+		return
+	}
 
+	// search post in database
+	post, err := posthelper.GetByID(ID)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	// return success
+	view.JSON(w, 200, post)
 }
 
 // DeletePost: delete a post
