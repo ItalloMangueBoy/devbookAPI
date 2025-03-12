@@ -93,3 +93,20 @@ func GetTimeline(ID int64) ([]model.Post, error) {
 	// return success
 	return timeline, nil
 }
+
+func Delete(ID int64) error {
+	// prepare query
+	stmt, err := db.Conn.Prepare("DELETE FROM posts WHERE id = ?")
+	if err != nil {
+		return errors.New("error on server operation")
+	}
+	defer stmt.Close()
+
+	// execute query
+	if _, err := stmt.Exec(ID); err != nil {
+		return errors.New("error on server operation")
+	}
+
+	// return success
+	return nil
+}
