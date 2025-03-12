@@ -78,6 +78,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	authID, err := auth.GetAuthenticatedId(r)
 	if err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
+		return
 	}
 
 	postID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
@@ -95,13 +96,14 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	// check if auth user is the post author
 	if post.AuthorID != authID {
-		err := errors.New("you cannot delete a post that is not yours")
-		view.GenErrorTemplate(err).Send(w, 403)
+		view.GenErrorTemplate(errors.New("you cannot delete a post that is not yours")).Send(w, 403)
+		return
 	}
 
 	// remove post from database
 	if err := posthelper.Delete(postID); err != nil {
 		view.GenErrorTemplate(err).Send(w, 500)
+		return
 	}
 
 	// return success
