@@ -59,9 +59,9 @@ func GetTimeline(ID int64) ([]model.Post, error) {
 			FROM posts p 
 			INNER JOIN users u ON p.user_id = u.id 
 			INNER JOIN followers f ON u.id = f.user_id 
-			WHERE f.follower_id = 3
-			ORDER BY p.created_at DESC;
-		`, ID)
+			WHERE u.id = ? OR f.follower_id = ?
+			ORDER BY p.created_at DESC 
+		`, ID, ID)
 
 	if err != nil {
 		return nil, errors.New("error on server operation")
