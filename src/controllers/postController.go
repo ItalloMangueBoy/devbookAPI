@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"devbookAPI/src/auth"
 	postsforms "devbookAPI/src/forms/postsForms"
 	"devbookAPI/src/helper/posthelper"
 	"devbookAPI/src/view"
@@ -51,12 +52,27 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	view.JSON(w, 200, post)
 }
 
-// DeletePost: delete a post
-func DeletePost(w http.ResponseWriter, r *http.Request) {
-
-}
-
 // GetTimeline: return the user timeline
 func GetTimeline(w http.ResponseWriter, r *http.Request) {
+	// get authenticated user ID
+	ID, err := auth.GetAuthenticatedId(r)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	// search timeline posts in database
+	timeline, err := posthelper.GetTimeline(ID)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	//return success
+	view.JSON(w, 200, timeline)
+}
+
+// DeletePost: delete a post
+func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 }

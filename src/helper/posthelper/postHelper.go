@@ -32,7 +32,8 @@ func GetByID(ID int64) (model.Post, error) {
 	err := db.Conn.
 		QueryRow(`
 			SELECT p.*, u.nick 
-			FROM posts p INNER JOIN users u ON p.user_id = u.id 
+			FROM posts p 
+			INNER JOIN users u ON p.user_id = u.id 
 			WHERE p.id = ?
 		`, ID).
 		Scan(
@@ -40,7 +41,7 @@ func GetByID(ID int64) (model.Post, error) {
 			&post.AuthorID,
 			&post.Content,
 			&post.Likes,
-			post.CreatedAt,
+			&post.CreatedAt,
 			&post.AuthorNick,
 		)
 	if err != nil {
@@ -48,4 +49,47 @@ func GetByID(ID int64) (model.Post, error) {
 	}
 
 	return post, nil
+}
+
+// GetTimeline: return the user timeline
+func GetTimeline(ID int64) ([]model.Post, error) {
+	// search posts in database
+	rows, err := db.Conn.Query(`
+			SELECT p.*, u.nick 
+			FROM posts p 
+			INNER JOIN users u ON p.user_id = u.id 
+			INNER JOIN followers f ON u.id = f.user_id 
+			WHERE f.follower_id = 3
+			ORDER BY p.created_at DESC;
+		`, ID)
+
+	if err != nil {
+		return nil, errors.New("error on server operation")
+	}
+	defer rows.Close()
+
+	// decode posts
+	var timeline []model.Post
+
+	for rows.Next() {
+		var post model.Post
+		if err := rows.Scan(
+			&post.ID,
+			&post.AuthorID,
+			&post.Content,
+			&post.Likes,
+			&post.CreatedAt,
+			&post.AuthorNick,
+		); err != nil {
+			return nil, errors.New("error on server operation")
+		}
+		timeline = append(timeline, post)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, errors.New("error on server operation")
+	}
+
+	// return success
+	return timeline, nil
 }

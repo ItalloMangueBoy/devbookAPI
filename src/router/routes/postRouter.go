@@ -13,17 +13,17 @@ var postRoutes = []Route{
 	},
 
 	{
-		URI:     "/timeline",
-		Method:  "GET",
-		Handler: controllers.GetTimeline,
-		Auth:    true,
-	},
-
-	{
 		URI:     "/posts/{id}",
 		Method:  "GET",
 		Handler: controllers.GetPost,
 		Auth:    false,
+	},
+
+	{
+		URI:     "/timeline",
+		Method:  "GET",
+		Handler: controllers.GetTimeline,
+		Auth:    true,
 	},
 
 	{
