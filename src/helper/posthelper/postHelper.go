@@ -55,7 +55,7 @@ func GetByID(ID int64) (model.Post, error) {
 func GetTimeline(ID int64) ([]model.Post, error) {
 	// search posts in database
 	rows, err := db.Conn.Query(`
-			SELECT p.*, u.nick 
+			SELECT DISTINCT p.*, u.nick 
 			FROM posts p 
 			INNER JOIN users u ON p.user_id = u.id 
 			INNER JOIN followers f ON u.id = f.user_id 
