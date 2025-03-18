@@ -20,6 +20,13 @@ var postRoutes = []Route{
 	},
 
 	{
+		URI:     "/users/{id}/posts",
+		Method:  "GET",
+		Handler: controllers.GetUserPosts,
+		Auth:    false, 
+	},
+
+	{
 		URI:     "/timeline",
 		Method:  "GET",
 		Handler: controllers.GetTimeline,

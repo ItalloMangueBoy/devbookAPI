@@ -72,6 +72,31 @@ func GetTimeline(w http.ResponseWriter, r *http.Request) {
 	view.JSON(w, 200, timeline)
 }
 
+// ListUserPosts: return all posts from a user
+func GetUserPosts(w http.ResponseWriter, r *http.Request) {
+	// read user ID
+	userID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(errors.New("invalid user ID")).Send(w, 422)
+		return
+	}
+
+	// search posts in database
+	posts, err := posthelper.ListUserPosts(userID)
+	if err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	if len(posts) == 0 {
+		view.GenErrorTemplate(errors.New("no posts found")).Send(w, 404)
+		return
+	}
+
+	// return success
+	view.JSON(w, 200, posts)
+}
+
 // DeletePost: delete a post
 func DeletePost(w http.ResponseWriter, r *http.Request) {
 	// get request data

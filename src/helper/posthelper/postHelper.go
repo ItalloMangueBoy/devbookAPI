@@ -94,6 +94,48 @@ func GetTimeline(ID int64) ([]model.Post, error) {
 	return timeline, nil
 }
 
+// ListUserPosts: return all posts from a user
+func ListUserPosts(ID int64) ([]model.Post, error) {
+	// execute query
+	rows, err := db.Conn.Query(`
+		SELECT p.*, u.nick 
+		FROM posts p
+		INNER JOIN users u ON u.id = p.user_id
+		WHERE user_id = ?
+	`, ID)
+	if err != nil {
+		return nil, errors.New("error on server operation")
+	}
+	defer rows.Close()
+
+	// decode data
+	var posts []model.Post
+
+	for rows.Next() {
+		var post model.Post
+
+		if err := rows.Scan(
+			&post.ID,
+			&post.AuthorID,
+			&post.Content,
+			&post.Likes,
+			&post.CreatedAt,
+			&post.AuthorNick,
+		); err != nil {
+			return nil, errors.New("error on server operation")
+		}
+
+		posts = append(posts, post)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, errors.New("error on server operation")
+	}
+
+	// return success
+	return posts, nil
+}
+
 func Delete(ID int64) error {
 	// remove post from database
 	_, err := db.Conn.Exec("DELETE FROM posts WHERE id = ?", ID)
