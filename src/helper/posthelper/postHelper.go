@@ -136,6 +136,31 @@ func ListUserPosts(ID int64) ([]model.Post, error) {
 	return posts, nil
 }
 
+// Like: increment the like count of a post in database
+func Like(ID int64) error {
+	// prepare query
+	_, err := db.Conn.Exec("UPDATE posts SET likes = likes + 1 WHERE id = ?", ID)
+	if err != nil {
+		return errors.New("error on server operation")
+	}
+
+	// return success
+	return nil
+}
+
+// Dislike: decrement the like count of a post in database
+func Dislike(ID int64) error {
+	// prepare query
+	_, err := db.Conn.Exec("UPDATE posts SET likes = likes - 1 WHERE id = ? AND likes > 0", ID)
+	if err != nil {
+		return errors.New("error on server operation")
+	}
+
+	// return success
+	return nil
+}
+
+// Delete: remove a post from database
 func Delete(ID int64) error {
 	// remove post from database
 	_, err := db.Conn.Exec("DELETE FROM posts WHERE id = ?", ID)

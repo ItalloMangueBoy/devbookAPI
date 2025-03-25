@@ -97,6 +97,34 @@ func GetUserPosts(w http.ResponseWriter, r *http.Request) {
 	view.JSON(w, 200, posts)
 }
 
+// LikePost: like a post
+func LikePost(w http.ResponseWriter, r *http.Request) {
+	handlePostReaction(w, r, posthelper.Like)
+}
+
+// DislikePost: dislike a post
+func DislikePost(w http.ResponseWriter, r *http.Request) {
+	handlePostReaction(w, r, posthelper.Dislike)
+}
+
+func handlePostReaction(w http.ResponseWriter, r *http.Request, reactionFunc func(int64) error) {
+	// get request data
+	ID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		view.GenErrorTemplate(errors.New("invalid post ID")).Send(w, 422)
+		return
+	}
+
+	// register reaction in database
+	if err := reactionFunc(ID); err != nil {
+		view.GenErrorTemplate(err).Send(w, 500)
+		return
+	}
+
+	// return success
+	w.WriteHeader(204)
+}
+
 // DeletePost: delete a post
 func DeletePost(w http.ResponseWriter, r *http.Request) {
 	// get request data

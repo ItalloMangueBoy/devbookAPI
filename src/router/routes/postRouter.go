@@ -23,13 +23,27 @@ var postRoutes = []Route{
 		URI:     "/users/{id}/posts",
 		Method:  "GET",
 		Handler: controllers.GetUserPosts,
-		Auth:    false, 
+		Auth:    false,
 	},
 
 	{
 		URI:     "/timeline",
 		Method:  "GET",
 		Handler: controllers.GetTimeline,
+		Auth:    true,
+	},
+
+	{
+		URI:     "/posts/{id}/like",
+		Method:  "PATCH",
+		Handler: controllers.LikePost,
+		Auth:    true,
+	},
+
+	{
+		URI:     "/posts/{id}/dislike",
+		Method:  "PATCH",
+		Handler: controllers.DislikePost,
 		Auth:    true,
 	},
 
